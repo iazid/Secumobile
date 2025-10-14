@@ -1,0 +1,46 @@
+services:
+  # Cible vulnérable (Skyblog)
+  target:
+    build: ./target
+    container_name: target
+    ports:
+      - "3000:3000"
+    networks:
+      - attack-net
+    restart: unless-stopped
+
+  # Backend orchestrateur (lance les attaques)
+  backend:
+    build: ./backend
+    container_name: backend-orchestrator
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./attack-scripts:/app/attack-scripts
+      - attack-logs:/app/logs
+    networks:
+      - attack-net
+    depends_on:
+      - target
+    restart: unless-stopped
+    environment:
+      - TARGET_URL=http://target:3000
+
+  # Interface React (dashboard)
+  frontend:
+    build: ./frontend
+    container_name: frontend-dashboard
+    ports:
+      - "8080:80"
+    networks:
+      - attack-net
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+networks:
+  attack-net:
+    driver: bridge
+
+volumes:
+  attack-logs:
