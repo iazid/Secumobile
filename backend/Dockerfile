@@ -1,13 +1,16 @@
 FROM node:18-alpine
 
-# Installer Python pour lancer les scripts d'attaque
-RUN apk add --no-cache python3 py3-pip
+# Installer les outils nécessaires
+RUN apk add --no-cache \
+    bash \
+    python3 \
+    py3-pip \
+    git 
 
-# Installer Git pour cloner des dépôts
-RUN apk add --no-cache git
-
-# Cloner SQLMap pour les attaques SQLi
-RUN git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git /app/sqlmap && \ ln -s /app/sqlmap/sqlmap.py /usr/local/bin/sqlmap
+# Installer SQLMap
+RUN git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git /app/sqlmap \
+ && ln -s /app/sqlmap/sqlmap.py /usr/local/bin/sqlmap \
+ && chmod +x /app/sqlmap/sqlmap.py
 
 WORKDIR /app
 

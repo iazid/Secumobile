@@ -7,7 +7,8 @@ function App() {
   const [attackStatus, setAttackStatus] = useState({
     xss: false,
     mitm: false,
-    ddos: false
+    ddos: false,
+    sql_injection: false
   });
 
   const [selectedAttack, setSelectedAttack] = useState('xss');
@@ -159,8 +160,8 @@ function App() {
                   type="radio"
                   name="attack"
                   id="sql_injection"
-                  checked={selectedAttack === 'sql injection'}
-                  onChange={() => setSelectedAttack('sql injection')}
+                  checked={selectedAttack === 'sql_injection'}
+                  onChange={() => setSelectedAttack('sql_injection')}
                 />
                 <label htmlFor="sql_injection">SQL Injection</label>
               </div>
