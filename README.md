@@ -27,7 +27,7 @@ docker-compose up --build
 - **Target (Cible)** : Système web vulnérable (port 3000)
 - **Backend Orchestrateur** : API Express pour lancer les attaques (port 4000)
 - **Frontend Dashboard** : Interface LOIC-style de contrôle (port 8080)
-- **Scripts d'attaque** : XSS (Ulrich), MitM + DDoS (Jordan)
+- **Scripts d'attaque** : XSS (Ulrich), MitM + DDoS + SQL Injection(Jordan)
 
 ## Utilisation
 
@@ -42,7 +42,7 @@ docker-compose up --build
 
 - **Yazid** : Infrastructure + Interface + Orchestration
 - **Ulrich** : Script d'attaque XSS
-- **Jordan** : Scripts d'attaque MitM + DDoS
+- **Jordan** : Scripts d'attaque SQL Injection + MitM + DDoS
 - **Alexandre** : Présentation
 
 ## Technologies

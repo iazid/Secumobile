@@ -154,6 +154,16 @@ function App() {
                 />
                 <label htmlFor="ddos">DDoS</label>
               </div>
+              <div className="attack-type">
+                <input
+                  type="radio"
+                  name="attack"
+                  id="sql_injection"
+                  checked={selectedAttack === 'sql injection'}
+                  onChange={() => setSelectedAttack('sql injection')}
+                />
+                <label htmlFor="sql_injection">SQL Injection</label>
+              </div>
             </div>
 
             <div className="attack-controls">

@@ -16,14 +16,16 @@ app.use(bodyParser.json());
 const attackProcesses = {
   xss: null,
   mitm: null,
-  ddos: null
+  ddos: null,
+  sql_injection: null
 };
 
 // Stockage des logs
 const attackLogs = {
   xss: [],
   mitm: [],
-  ddos: []
+  ddos: [],
+  sql_injection: []
 };
 
 // Créer le dossier logs si nécessaire
@@ -44,7 +46,8 @@ app.get('/api/attacks/status', (req, res) => {
   res.json({
     xss: attackProcesses.xss !== null,
     mitm: attackProcesses.mitm !== null,
-    ddos: attackProcesses.ddos !== null
+    ddos: attackProcesses.ddos !== null,
+    sql_injection: attackProcesses.sql_injection !== null
   });
 });
 
@@ -218,6 +221,64 @@ app.post('/api/attacks/ddos/stop', (req, res) => {
 app.get('/api/attacks/ddos/logs', (req, res) => {
   res.json(attackLogs.ddos);
 });
+
+// =======================
+// SQL Injection Attack Routes
+// =======================
+
+// Lancer l'attaque SQL Injection
+app.post('/api/attacks/sql_injection/start', (req, res) => {
+  if (attackProcesses.sql_injection !== null) {
+    return res.status(400).json({ error: 'SQL Injection attack already running' });
+  }
+
+  attackLogs.sql_injection = [];
+  attackLogs.sql_injection.push({ timestamp: new Date(), message: 'Starting SQL Injection attack...' });
+
+  // Lancer le script Bash de Jordan
+  const scriptPath = path.join(__dirname, 'attack-scripts', 'sql_injection', 'sql_attack.sh');
+
+  const process = spawn('bash', [scriptPath, process.env.TARGET_URL || 'http://target:3000']);
+
+  process.stdout.on('data', (data) => {
+    const message = data.toString().trim();
+    attackLogs.sql_injection.push({ timestamp: new Date(), message });
+    console.log(`[SQL Injection] ${message}`);
+  });
+
+  process.stderr.on('data', (data) => {
+    const message = data.toString().trim();
+    attackLogs.sql_injection.push({ timestamp: new Date(), message, type: 'error' });
+    console.error(`[SQL Injection ERROR] ${message}`);
+  });
+
+  process.on('close', (code) => {
+    attackLogs.sql_injection.push({ timestamp: new Date(), message: `Process exited with code ${code}` });
+    attackProcesses.sql_injection = null;
+  });
+
+  attackProcesses.sql_injection = process;
+  res.json({ success: true, message: 'SQL Injection attack started' });
+});
+
+// Arrêter l'attaque SQL Injection
+app.post('/api/attacks/sql_injection/stop', (req, res) => {
+  if (attackProcesses.sql_injection === null) {
+    return res.status(400).json({ error: 'No SQL Injection attack running' });
+  }
+
+  attackProcesses.sql_injection.kill();
+  attackProcesses.sql_injection = null;
+  attackLogs.sql_injection.push({ timestamp: new Date(), message: 'SQL Injection attack stopped by user' });
+
+  res.json({ success: true, message: 'SQL Injection attack stopped' });
+});
+
+// Obtenir les logs SQL Injection
+app.get('/api/attacks/sql_injection/logs', (req, res) => {
+  res.json(attackLogs.sql_injection);
+});
+
 
 // =======================
 // Reset Environment
