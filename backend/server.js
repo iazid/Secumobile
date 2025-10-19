@@ -64,10 +64,10 @@ app.post('/api/attacks/xss/start', (req, res) => {
   attackLogs.xss = [];
   attackLogs.xss.push({ timestamp: new Date(), message: 'Starting XSS attack...' });
 
-  // Lancer le script Python d'Ulrich
-  const scriptPath = path.join(__dirname, 'attack-scripts', 'xss', 'xss_attack.py');
+  // Lancer le script Python de Jordan
+  const scriptPath = path.join(__dirname, 'attack-scripts', 'xss', 'xss_attack.sh');
 
-  const process = spawn('python3', [scriptPath, process.env.TARGET_URL || 'http://target:3000']);
+  const process = spawn('bash', [scriptPath, process.env.TARGET_URL || 'http://target:3000']);
 
   process.stdout.on('data', (data) => {
     const message = data.toString().trim();
