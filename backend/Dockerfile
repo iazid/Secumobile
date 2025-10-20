@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:18-alpine 
 
 # Installer les outils nécessaires
 RUN apk add --no-cache \
@@ -16,6 +16,11 @@ RUN git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git /app/sqlmap 
 RUN git clone --depth 1 https://github.com/epsylon/xsser.git /app/xsser \
  && ln -s /app/xsser/xsser /usr/local/bin/xsser \
  && chmod +x /app/xsser/xsser
+
+# Installer Slowloris
+RUN git clone --depth 1 https://github.com/gkbrk/slowloris.git /app/slowloris \
+ && ln -s /app/slowloris/slowloris.py /usr/local/bin/slowloris \
+ && chmod +x /app/slowloris/slowloris.py
 
 WORKDIR /app
 
