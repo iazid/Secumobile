@@ -6,7 +6,6 @@ const API_BASE_URL = 'http://localhost:4000/api';
 function App() {
   const [attackStatus, setAttackStatus] = useState({
     xss: false,
-    mitm: false,
     ddos: false,
     sql_injection: false
   });
@@ -98,7 +97,7 @@ function App() {
     setTargetIP(newIP);
   };
 
-  const isAnyAttackRunning = attackStatus.xss || attackStatus.mitm || attackStatus.ddos;
+  const isAnyAttackRunning = attackStatus.xss || attackStatus.sql_injection || attackStatus.ddos;
 
   return (
     <div className="App">
@@ -134,16 +133,6 @@ function App() {
                   onChange={() => setSelectedAttack('xss')}
                 />
                 <label htmlFor="xss">XSS</label>
-              </div>
-              <div className="attack-type">
-                <input
-                  type="radio"
-                  name="attack"
-                  id="mitm"
-                  checked={selectedAttack === 'mitm'}
-                  onChange={() => setSelectedAttack('mitm')}
-                />
-                <label htmlFor="mitm">MitM</label>
               </div>
               <div className="attack-type">
                 <input

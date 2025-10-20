@@ -4,20 +4,21 @@
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                   Docker Network (attack-net)            │
-│                                                          │
-│  ┌──────────────┐      ┌──────────────┐      ┌────────┐│
-│  │   Frontend   │─────▶│   Backend    │─────▶│ Target ││
-│  │   (React)    │      │  (Express)   │      │ (Cible)││
-│  │              │      │              │      │        ││
-│  │ Port: 8080   │      │ Port: 4000   │      │Port:3000│
-│  └──────────────┘      └──────┬───────┘      └───▲────┘│
+│                   Docker Network (attack-net)           │
+│                                                         │
+│  ┌──────────────┐      ┌──────────────┐      ┌────────┐ │
+│  │   Frontend   │─────▶│   Backend    │─────▶│ Target │ │
+│  │   (React)    │      │  (Express)   │      │ (Cible)│ │
+│  │              │      │              │      │        │ │
+│  │ Port: 8080   │      │ Port: 4000   │      │Port:3000 │
+│  └──────────────┘      └──────┬───────┘      └───▲────┘ │
 │                               │                   │     │
 │                               ▼                   │     │
 │                        ┌─────────────┐            │     │
 │                        │   Attack    │────────────┘     │
 │                        │   Scripts   │                  │
-│                        │ (XSS/MitM/  │                  │
+│                        │ (XSS/SQL    │                  │
+│                        │   Injection/│                  │
 │                        │    DDoS)    │                  │
 │                        └─────────────┘                  │
 └─────────────────────────────────────────────────────────┘
@@ -40,7 +41,7 @@
 
 **Fonctionnalités** :
 - Génération d'IP cible aléatoire (cosmétique)
-- Radio buttons pour sélectionner l'attaque (XSS, MitM, DDoS)
+- Radio buttons pour sélectionner l'attaque (XSS, SQL Injection, DDoS)
 - Boutons style Windows 95/XP
 - LEDs de statut en temps réel
 - Terminal avec logs
@@ -65,9 +66,9 @@ POST /api/attacks/xss/start     # Lancer XSS
 POST /api/attacks/xss/stop      # Arrêter XSS
 GET  /api/attacks/xss/logs      # Logs XSS
 
-POST /api/attacks/mitm/start    # Lancer MitM
-POST /api/attacks/mitm/stop     # Arrêter MitM
-GET  /api/attacks/mitm/logs     # Logs MitM
+POST /api/attacks/sql_injection/start    # Lancer SQL Injection
+POST /api/attacks/sql_injection/stop     # Arrêter SQL Injection
+GET  /api/attacks/sql_injection/logs     # Logs SQL Injection
 
 POST /api/attacks/ddos/start    # Lancer DDoS
 POST /api/attacks/ddos/stop     # Arrêter DDoS
@@ -105,23 +106,22 @@ GET  /health                # Health check
 
 **Vulnérabilités intentionnelles** :
 - Pas de sanitisation HTML (XSS)
-- Pas de HTTPS (MitM)
 - Pas de rate limiting (DDoS)
 - Pas de CSRF protection
 - Pas de Content Security Policy
 
 ### 4. Attack Scripts
 
-#### XSS (Ulrich)
+#### XSS (Jordan)
 - Dossier : `attack-scripts/xss/`
 - Script à créer : `xss_attack.py`
 - Cible : Injection de code malveillant
 - README avec suggestions fourni
 
-#### MitM (Jordan)
-- Dossier : `attack-scripts/mitm/`
-- Script à créer : `mitm_attack.py`
-- Cible : Interception du trafic réseau
+#### SQL Injection (Jordan)
+- Dossier : `attack-scripts/sql_attack.sh/`
+- Script à créer : `sql_attack.sh`
+- Cible : 
 - README avec suggestions fourni
 
 #### DDoS (Jordan)
@@ -135,7 +135,7 @@ GET  /health                # Health check
 ### Démarrage d'une attaque
 
 ```
-1. User sélectionne une attaque (XSS/MitM/DDoS) dans le dashboard
+1. User sélectionne une attaque (XSS/SQL Injection/DDoS) dans le dashboard
    │
    ▼
 2. User clique "LANCER L'ATTAQUE"
@@ -229,7 +229,7 @@ projet-secumobile/
 │   ├── xss/                  # À remplir par Ulrich
 │   │   ├── .gitkeep
 │   │   └── README.md
-│   ├── mitm/                 # À remplir par Jordan
+│   ├── sql_injection/                 # À remplir par Jordan
 │   │   ├── .gitkeep
 │   │   └── README.md
 │   └── ddos/                 # À remplir par Jordan

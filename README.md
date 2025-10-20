@@ -1,6 +1,6 @@
 # Projet Simulateur de Cyberattaques
 
-Interface graphique pour simuler 3 cyberattaques sur un système cible vulnérable : XSS, MitM et DDoS.
+Interface graphique pour simuler 3 cyberattaques sur un système cible vulnérable : XSS, SQL Injection et DDoS.
 
 ## Architecture
 
@@ -8,7 +8,7 @@ Interface graphique pour simuler 3 cyberattaques sur un système cible vulnérab
 target/             # Système cible vulnérable
 backend/            # Backend orchestrateur Express
 frontend/           # Interface LOIC-style (dashboard)
-attack-scripts/     # Scripts d'attaque (XSS, MitM, DDoS)
+attack-scripts/     # Scripts d'attaque (XSS, SQL Injection, DDoS)
 ```
 
 ## Démarrage rapide
@@ -27,14 +27,14 @@ docker-compose up --build
 - **Target (Cible)** : Système web vulnérable (port 3000)
 - **Backend Orchestrateur** : API Express pour lancer les attaques (port 4000)
 - **Frontend Dashboard** : Interface LOIC-style de contrôle (port 8080)
-- **Scripts d'attaque** : XSS (Ulrich), MitM + DDoS + SQL Injection(Jordan)
+- **Scripts d'attaque** : XSS + DDoS + SQL Injection(Jordan)
 
 ## Utilisation
 
 1. Lancer l'environnement : `docker-compose up --build`
 2. Ouvrir le dashboard : http://localhost:8080
 3. Générer une IP cible (bouton "Nouvelle IP")
-4. Sélectionner un type d'attaque (XSS / MitM / DDoS)
+4. Sélectionner un type d'attaque (XSS / SQL Injection / DDoS)
 5. Cliquer sur "LANCER L'ATTAQUE"
 6. Observer les logs en temps réel
 
@@ -42,7 +42,7 @@ docker-compose up --build
 
 - **Yazid** : Infrastructure + Interface + Orchestration
 - **Ulrich** : Script d'attaque XSS
-- **Jordan** : Scripts d'attaque SQL Injection + MitM + DDoS
+- **Jordan** : Scripts d'attaque SQL Injection + SQL Injection + DDoS
 - **Alexandre** : Présentation
 
 ## Technologies

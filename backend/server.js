@@ -15,7 +15,6 @@ app.use(bodyParser.json());
 // Stockage des processus d'attaque en cours
 const attackProcesses = {
   xss: null,
-  mitm: null,
   ddos: null,
   sql_injection: null
 };
@@ -23,7 +22,6 @@ const attackProcesses = {
 // Stockage des logs
 const attackLogs = {
   xss: [],
-  mitm: [],
   ddos: [],
   sql_injection: []
 };
@@ -45,7 +43,6 @@ app.get('/health', (req, res) => {
 app.get('/api/attacks/status', (req, res) => {
   res.json({
     xss: attackProcesses.xss !== null,
-    mitm: attackProcesses.mitm !== null,
     ddos: attackProcesses.ddos !== null,
     sql_injection: attackProcesses.sql_injection !== null
   });
@@ -106,63 +103,6 @@ app.post('/api/attacks/xss/stop', (req, res) => {
 // Obtenir les logs XSS
 app.get('/api/attacks/xss/logs', (req, res) => {
   res.json(attackLogs.xss);
-});
-
-// =======================
-// MitM Attack Routes
-// =======================
-
-// Lancer l'attaque MitM
-app.post('/api/attacks/mitm/start', (req, res) => {
-  if (attackProcesses.mitm !== null) {
-    return res.status(400).json({ error: 'MitM attack already running' });
-  }
-
-  attackLogs.mitm = [];
-  attackLogs.mitm.push({ timestamp: new Date(), message: 'Starting MitM attack...' });
-
-  // Lancer le script de Jordan
-  const scriptPath = path.join(__dirname, 'attack-scripts', 'mitm', 'mitm_attack.py');
-
-  const process = spawn('python3', [scriptPath, process.env.TARGET_URL || 'http://target:3000']);
-
-  process.stdout.on('data', (data) => {
-    const message = data.toString().trim();
-    attackLogs.mitm.push({ timestamp: new Date(), message });
-    console.log(`[MitM] ${message}`);
-  });
-
-  process.stderr.on('data', (data) => {
-    const message = data.toString().trim();
-    attackLogs.mitm.push({ timestamp: new Date(), message, type: 'error' });
-    console.error(`[MitM ERROR] ${message}`);
-  });
-
-  process.on('close', (code) => {
-    attackLogs.mitm.push({ timestamp: new Date(), message: `Process exited with code ${code}` });
-    attackProcesses.mitm = null;
-  });
-
-  attackProcesses.mitm = process;
-  res.json({ success: true, message: 'MitM attack started' });
-});
-
-// Arrêter l'attaque MitM
-app.post('/api/attacks/mitm/stop', (req, res) => {
-  if (attackProcesses.mitm === null) {
-    return res.status(400).json({ error: 'No MitM attack running' });
-  }
-
-  attackProcesses.mitm.kill();
-  attackProcesses.mitm = null;
-  attackLogs.mitm.push({ timestamp: new Date(), message: 'MitM attack stopped by user' });
-
-  res.json({ success: true, message: 'MitM attack stopped' });
-});
-
-// Obtenir les logs MitM
-app.get('/api/attacks/mitm/logs', (req, res) => {
-  res.json(attackLogs.mitm);
 });
 
 // =======================
