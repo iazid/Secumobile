@@ -19,7 +19,7 @@
 │                        │   Scripts   │                  │
 │                        │ (XSS/SQL    │                  │
 │                        │   Injection/│                  │
-│                        │    DDoS)    │                  │
+│                        │    DoS)    │                  │
 │                        └─────────────┘                  │
 └─────────────────────────────────────────────────────────┘
 ```
@@ -41,7 +41,7 @@
 
 **Fonctionnalités** :
 - Génération d'IP cible aléatoire (cosmétique)
-- Radio buttons pour sélectionner l'attaque (XSS, SQL Injection, DDoS)
+- Radio buttons pour sélectionner l'attaque (XSS, SQL Injection, DoS)
 - Boutons style Windows 95/XP
 - LEDs de statut en temps réel
 - Terminal avec logs
@@ -70,9 +70,9 @@ POST /api/attacks/sql_injection/start    # Lancer SQL Injection
 POST /api/attacks/sql_injection/stop     # Arrêter SQL Injection
 GET  /api/attacks/sql_injection/logs     # Logs SQL Injection
 
-POST /api/attacks/ddos/start    # Lancer DDoS
-POST /api/attacks/ddos/stop     # Arrêter DDoS
-GET  /api/attacks/ddos/logs     # Logs DDoS
+POST /api/attacks/dos/start    # Lancer DoS
+POST /api/attacks/dos/stop     # Arrêter DoS
+GET  /api/attacks/dos/logs     # Logs DoS
 
 POST /api/reset                 # Reset complet
 ```
@@ -106,7 +106,7 @@ GET  /health                # Health check
 
 **Vulnérabilités intentionnelles** :
 - Pas de sanitisation HTML (XSS)
-- Pas de rate limiting (DDoS)
+- Pas de rate limiting (DoS)
 - Pas de CSRF protection
 - Pas de Content Security Policy
 
@@ -124,9 +124,9 @@ GET  /health                # Health check
 - Cible : 
 - README avec suggestions fourni
 
-#### DDoS (Jordan)
-- Dossier : `attack-scripts/ddos/`
-- Script à créer : `ddos_attack.py`
+#### DoS (Jordan)
+- Dossier : `attack-scripts/dos/`
+- Script à créer : `dos_attack.sh`
 - Cible : Saturation du serveur
 - README avec suggestions fourni
 
@@ -135,7 +135,7 @@ GET  /health                # Health check
 ### Démarrage d'une attaque
 
 ```
-1. User sélectionne une attaque (XSS/SQL Injection/DDoS) dans le dashboard
+1. User sélectionne une attaque (XSS/SQL Injection/DoS) dans le dashboard
    │
    ▼
 2. User clique "LANCER L'ATTAQUE"
@@ -226,14 +226,11 @@ projet-secumobile/
 │   └── Dockerfile
 │
 ├── attack-scripts/            # Scripts d'attaque
-│   ├── xss/                  # À remplir par Ulrich
-│   │   ├── .gitkeep
+│   ├── xss/                  # À remplir par Jordan
 │   │   └── README.md
 │   ├── sql_injection/                 # À remplir par Jordan
-│   │   ├── .gitkeep
 │   │   └── README.md
-│   └── ddos/                 # À remplir par Jordan
-│       ├── .gitkeep
+│   └── dos/                 # À remplir par Jordan
 │       └── README.md
 │
 ├── docker-compose.yml         # Configuration Docker

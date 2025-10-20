@@ -1,9 +1,9 @@
-# DDoS Attack Script - Jordan
+# DoS Attack Script - Jordan
 
 ## Description
 Script de déni de service distribué pour saturer le système de vote et le rendre indisponible.
 
-## Types d'attaques DDoS
+## Types d'attaques DoS
 1. **HTTP Flood** : Requêtes HTTP massives
 2. **SYN Flood** : Saturation des connexions TCP
 3. **Slowloris** : Maintien de connexions lentes
@@ -11,7 +11,7 @@ Script de déni de service distribué pour saturer le système de vote et le ren
 
 ## Utilisation
 ```bash
-python3 ddos_attack.py http://voting-system:3000
+python3 dos_attack.sh http://voting-system:3000
 ```
 
 ## Outils suggérés
@@ -34,7 +34,7 @@ python3 ddos_attack.py http://voting-system:3000
 - Blacklisting d'IPs suspectes
 
 ## TODO pour Jordan
-- [ ] Implémenter plusieurs types d'attaques DDoS
+- [ ] Implémenter plusieurs types d'attaques DoS
 - [ ] Mesurer l'impact sur le serveur (temps de réponse)
 - [ ] Tester avec hping3 si disponible
 - [ ] Implémenter Slowloris

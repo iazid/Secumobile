@@ -6,7 +6,7 @@ const API_BASE_URL = 'http://localhost:4000/api';
 function App() {
   const [attackStatus, setAttackStatus] = useState({
     xss: false,
-    ddos: false,
+    dos: false,
     sql_injection: false
   });
 
@@ -97,7 +97,7 @@ function App() {
     setTargetIP(newIP);
   };
 
-  const isAnyAttackRunning = attackStatus.xss || attackStatus.sql_injection || attackStatus.ddos;
+  const isAnyAttackRunning = attackStatus.xss || attackStatus.sql_injection || attackStatus.dos;
 
   return (
     <div className="App">
@@ -138,11 +138,11 @@ function App() {
                 <input
                   type="radio"
                   name="attack"
-                  id="ddos"
-                  checked={selectedAttack === 'ddos'}
-                  onChange={() => setSelectedAttack('ddos')}
+                  id="dos"
+                  checked={selectedAttack === 'dos'}
+                  onChange={() => setSelectedAttack('dos')}
                 />
-                <label htmlFor="ddos">DDoS</label>
+                <label htmlFor="dos">DoS</label>
               </div>
               <div className="attack-type">
                 <input

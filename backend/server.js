@@ -15,14 +15,14 @@ app.use(bodyParser.json());
 // Stockage des processus d'attaque en cours
 const attackProcesses = {
   xss: null,
-  ddos: null,
+  dos: null,
   sql_injection: null
 };
 
 // Stockage des logs
 const attackLogs = {
   xss: [],
-  ddos: [],
+  dos: [],
   sql_injection: []
 };
 
@@ -43,7 +43,7 @@ app.get('/health', (req, res) => {
 app.get('/api/attacks/status', (req, res) => {
   res.json({
     xss: attackProcesses.xss !== null,
-    ddos: attackProcesses.ddos !== null,
+    dos: attackProcesses.dos !== null,
     sql_injection: attackProcesses.sql_injection !== null
   });
 });
@@ -106,60 +106,60 @@ app.get('/api/attacks/xss/logs', (req, res) => {
 });
 
 // =======================
-// DDoS Attack Routes
+// Dos Attack Routes
 // =======================
 
-// Lancer l'attaque DDoS
-app.post('/api/attacks/ddos/start', (req, res) => {
-  if (attackProcesses.ddos !== null) {
-    return res.status(400).json({ error: 'DDoS attack already running' });
+// Lancer l'attaque DoS
+app.post('/api/attacks/dos/start', (req, res) => {
+  if (attackProcesses.dos !== null) {
+    return res.status(400).json({ error: 'DoS attack already running' });
   }
 
-  attackLogs.ddos = [];
-  attackLogs.ddos.push({ timestamp: new Date(), message: 'Starting DDoS attack...' });
+  attackLogs.dos = [];
+  attackLogs.dos.push({ timestamp: new Date(), message: 'Starting DoS attack...' });
 
   // Lancer le script de Jordan
-  const scriptPath = path.join(__dirname, 'attack-scripts', 'ddos', 'ddos_attack.py');
+  const scriptPath = path.join(__dirname, 'attack-scripts', 'dos', 'dos_attack.sh');
 
-  const process = spawn('python3', [scriptPath, process.env.TARGET_URL || 'http://target:3000']);
+  const process = spawn('bash', [scriptPath, process.env.TARGET_URL || 'http://target:3000']);
 
   process.stdout.on('data', (data) => {
     const message = data.toString().trim();
-    attackLogs.ddos.push({ timestamp: new Date(), message });
-    console.log(`[DDoS] ${message}`);
+    attackLogs.dos.push({ timestamp: new Date(), message });
+    console.log(`[DoS] ${message}`);
   });
 
   process.stderr.on('data', (data) => {
     const message = data.toString().trim();
-    attackLogs.ddos.push({ timestamp: new Date(), message, type: 'error' });
-    console.error(`[DDoS ERROR] ${message}`);
+    attackLogs.dos.push({ timestamp: new Date(), message, type: 'error' });
+    console.error(`[DoS ERROR] ${message}`);
   });
 
   process.on('close', (code) => {
-    attackLogs.ddos.push({ timestamp: new Date(), message: `Process exited with code ${code}` });
-    attackProcesses.ddos = null;
+    attackLogs.dos.push({ timestamp: new Date(), message: `Process exited with code ${code}` });
+    attackProcesses.dos = null;
   });
 
-  attackProcesses.ddos = process;
-  res.json({ success: true, message: 'DDoS attack started' });
+  attackProcesses.dos = process;
+  res.json({ success: true, message: 'DoS attack started' });
 });
 
-// Arrêter l'attaque DDoS
-app.post('/api/attacks/ddos/stop', (req, res) => {
-  if (attackProcesses.ddos === null) {
-    return res.status(400).json({ error: 'No DDoS attack running' });
+// Arrêter l'attaque DoS
+app.post('/api/attacks/dos/stop', (req, res) => {
+  if (attackProcesses.dos === null) {
+    return res.status(400).json({ error: 'No DoS attack running' });
   }
 
-  attackProcesses.ddos.kill();
-  attackProcesses.ddos = null;
-  attackLogs.ddos.push({ timestamp: new Date(), message: 'DDoS attack stopped by user' });
+  attackProcesses.dos.kill();
+  attackProcesses.dos = null;
+  attackLogs.dos.push({ timestamp: new Date(), message: 'DoS attack stopped by user' });
 
-  res.json({ success: true, message: 'DDoS attack stopped' });
+  res.json({ success: true, message: 'DoS attack stopped' });
 });
 
-// Obtenir les logs DDoS
-app.get('/api/attacks/ddos/logs', (req, res) => {
-  res.json(attackLogs.ddos);
+// Obtenir les logs DoS
+app.get('/api/attacks/dos/logs', (req, res) => {
+  res.json(attackLogs.dos);
 });
 
 // =======================
