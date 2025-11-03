@@ -1,16 +1,25 @@
-FROM node:18-alpine 
+FROM node:18-slim
 
 # Installer les outils nécessaires
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y \
     bash \
     python3 \
-    py3-pip \
-    git 
+    python3-pip \
+    python3-pycurl \
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Installer les dépendances Python
+RUN pip3 install --no-cache-dir --break-system-packages requests beautifulsoup4 lxml
 
 # Installer SQLMap
 RUN git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git /app/sqlmap \
  && ln -s /app/sqlmap/sqlmap.py /usr/local/bin/sqlmap \
  && chmod +x /app/sqlmap/sqlmap.py
+
+# Créer un alias python -> python3
+RUN ln -s /usr/bin/python3 /usr/bin/python
 
 # Installer Xsser
 RUN git clone --depth 1 https://github.com/epsylon/xsser.git /app/xsser \

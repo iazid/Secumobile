@@ -28,24 +28,32 @@
 
 ### 1. Frontend (React) - Port 8080
 
-**Rôle** : Interface de contrôle style LOIC
+**Rôle** : Interface de contrôle et visualisation des attaques
 
 **Technologies** :
 - React 18
-- CSS custom (style LOIC old school)
+- Chart.js pour les graphiques temps réel
+- CSS custom (style sobre et professionnel)
 - Nginx pour servir en production
 
 **Composants principaux** :
-- `App.js` : Interface complète avec génération d'IP
-- Style inspiré de LOIC (Low Orbit Ion Cannon)
+- `App.js` : Interface complète avec sélection d'attaque
+- `App.css` : Styles sans arrondis, couleurs neutres
 
 **Fonctionnalités** :
-- Génération d'IP cible aléatoire (cosmétique)
-- Radio buttons pour sélectionner l'attaque (XSS, SQL Injection, DoS)
-- Boutons style Windows 95/XP
-- LEDs de statut en temps réel
-- Terminal avec logs
-- Contrôles : threads, méthode, vitesse
+- Sélection d'attaque : XSS, SQL Injection, DoS
+- Paramètres configurables pour chaque attaque :
+  - **XSS** : Mode (auto/manuel), Type de payload (basic/mixed/advanced)
+  - **SQL** : Niveau (1-5), Technique SQLMap
+  - **DoS** : Nombre de sockets, Sleeptime
+- Boutons de contrôle : Lancer, Arrêter, Réinitialiser, Ouvrir cible
+- LEDs de statut en temps réel (Backend, XSS, SQL, DoS)
+- Terminal avec logs scrollables
+- **Résultats extraits** :
+  - XSS : Statistiques + capture d'écran
+  - SQL : Dump de BDD avec users + hash MD5
+  - DoS : Graphiques temps de réponse + req/sec
+- Descriptions intégrées de chaque type d'attaque
 
 ### 2. Backend (Express) - Port 4000
 
@@ -59,76 +67,96 @@
 **Routes API** :
 
 ```
-GET  /health                    # Health check
-GET  /api/attacks/status        # Statut de toutes les attaques
+GET  /health                           # Health check
+GET  /api/attacks/status               # Statut de toutes les attaques
 
-POST /api/attacks/xss/start     # Lancer XSS
-POST /api/attacks/xss/stop      # Arrêter XSS
-GET  /api/attacks/xss/logs      # Logs XSS
+POST /api/attacks/xss/start            # Lancer XSS (avec params)
+POST /api/attacks/xss/stop             # Arrêter XSS
+GET  /api/attacks/xss/logs             # Logs XSS
 
-POST /api/attacks/sql_injection/start    # Lancer SQL Injection
-POST /api/attacks/sql_injection/stop     # Arrêter SQL Injection
-GET  /api/attacks/sql_injection/logs     # Logs SQL Injection
+POST /api/attacks/sql_injection/start  # Lancer SQL (avec params)
+POST /api/attacks/sql_injection/stop   # Arrêter SQL
+GET  /api/attacks/sql_injection/logs   # Logs SQL
 
-POST /api/attacks/dos/start    # Lancer DoS
-POST /api/attacks/dos/stop     # Arrêter DoS
-GET  /api/attacks/dos/logs     # Logs DoS
+POST /api/attacks/dos/start            # Lancer DoS (avec params)
+POST /api/attacks/dos/stop             # Arrêter DoS
+GET  /api/attacks/dos/logs             # Logs DoS
+GET  /api/attacks/dos/metrics          # Métriques temps réel
 
-POST /api/reset                 # Reset complet
+POST /api/reset                        # Reset complet
 ```
 
 **Gestion des processus** :
 - Stocke les processus d'attaque en mémoire
-- Capture stdout/stderr des scripts Python
+- Capture stdout/stderr des scripts bash
 - Permet l'arrêt gracieux des attaques
+- **Collecte de métriques DoS** :
+  - 10 requêtes/seconde vers la cible
+  - Calcul temps de réponse moyen
+  - Calcul requêtes par seconde réelles
+  - Limite à 50 points de données
+  - Intervalle de 1 seconde
 
-### 3. Target (Cible) - Port 3000
+### 3. Target (DVWA) - Port 3000
 
-**Rôle** : Système web volontairement vulnérable
+**Rôle** : Application web volontairement vulnérable (référence OWASP)
 
 **Technologies** :
-- Node.js + Express
-- SQLite pour la base de données
-- HTML/CSS simple
+- DVWA (Damn Vulnerable Web Application)
+- PHP + MySQL/MariaDB
+- Apache Web Server
 
-**Page actuelle** :
-- `/` : Page simple affichant "CIBLE"
+**Pages ciblées** :
+- `/vulnerabilities/xss_r/` : XSS Reflected
+- `/vulnerabilities/sqli/` : SQL Injection
+- Serveur entier pour DoS
 
-**API disponibles** :
-```
-POST /api/posts             # Créer article (pour XSS futur)
-GET  /api/posts             # Liste des articles
-POST /api/comments          # Poster commentaire (VULNÉRABLE XSS)
-GET  /api/comments/:id      # Obtenir commentaires
-POST /api/reset             # Reset la DB
-GET  /health                # Health check
-```
+**Configuration requise** :
+- Security Level : **Low**
+- Créer/Reset la base de données au premier lancement
+- Login : admin / password
 
-**Vulnérabilités intentionnelles** :
-- Pas de sanitisation HTML (XSS)
-- Pas de rate limiting (DoS)
-- Pas de CSRF protection
-- Pas de Content Security Policy
+**Vulnérabilités exploitées** :
+- **XSS** : Pas d'échappement HTML dans les entrées utilisateur
+- **SQL Injection** : Requêtes SQL non préparées, concaténation directe
+- **DoS** : Pas de rate limiting, vulnérable à Slowloris
 
 ### 4. Attack Scripts
 
-#### XSS (Jordan)
-- Dossier : `attack-scripts/xss/`
-- Script à créer : `xss_attack.py`
-- Cible : Injection de code malveillant
-- README avec suggestions fourni
+#### XSS
+- **Dossier** : `attack-scripts/xss/`
+- **Script** : `xss_attack.sh`
+- **Outil** : XSSer (framework automatique)
+- **Méthode** :
+  1. Scan automatique avec XSSer
+  2. Fallback avec payloads manuels via curl
+  3. Tests : `<script>`, `<img onerror>`, `<svg onload>`
+- **Sortie** : Logs + statistiques de vulnérabilités détectées
 
-#### SQL Injection (Jordan)
-- Dossier : `attack-scripts/sql_attack.sh/`
-- Script à créer : `sql_attack.sh`
-- Cible : 
-- README avec suggestions fourni
+#### SQL Injection
+- **Dossier** : `attack-scripts/sql_injection/`
+- **Script** : `sql_attack.sh`
+- **Outil** : SQLMap
+- **Méthode** :
+  1. Configuration niveau Low dans DVWA
+  2. Test avec payload `1' OR '1'='1`
+  3. Extraction BDD : version, nom, user
+  4. Dump complet des tables users
+- **Sortie** : Logs + données extraites (users + hash MD5)
 
-#### DoS (Jordan)
-- Dossier : `attack-scripts/dos/`
-- Script à créer : `dos_attack.sh`
-- Cible : Saturation du serveur
-- README avec suggestions fourni
+#### DoS
+- **Dossier** : `attack-scripts/dos/`
+- **Script** : `dos_attack.sh`
+- **Outil** : Slowloris (Python)
+- **Méthode** :
+  1. Ouverture de N sockets vers le serveur
+  2. Envoi de requêtes HTTP partielles
+  3. Maintien des connexions avec headers périodiques
+  4. Saturation progressive du pool Apache
+- **Paramètres** :
+  - `--sockets` : 50-1000 (nombre de connexions)
+  - `--sleeptime` : 1-30s (délai entre envois)
+- **Impact** : Temps de réponse ↑, Débit ↓
 
 ## Flux de données
 

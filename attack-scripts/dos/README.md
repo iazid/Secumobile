@@ -1,44 +1,42 @@
-# DoS Attack Script - Jordan
+# DoS Attack Script
 
 ## Description
-Script de déni de service distribué pour saturer le système de vote et le rendre indisponible.
+Script d'attaque par déni de service (DoS) utilisant **Slowloris** pour saturer le serveur DVWA et le rendre indisponible.
 
-## Types d'attaques DoS
-1. **HTTP Flood** : Requêtes HTTP massives
-2. **SYN Flood** : Saturation des connexions TCP
-3. **Slowloris** : Maintien de connexions lentes
-4. **UDP Flood** : Inondation de paquets UDP
+## Outil utilisé
+**Slowloris** - Attaque DoS qui maintient des connexions HTTP lentes pour épuiser les ressources du serveur.
 
 ## Utilisation
 ```bash
-python3 dos_attack.sh http://voting-system:3000
+bash dos_attack.sh http://target:80
 ```
 
-## Outils suggérés
-- **hping3** : Attaque au niveau TCP/IP
-- **LOIC** (Low Orbit Ion Cannon)
-- **Threading Python** : HTTP flood simple
-- **Scapy** : Manipulation de paquets
+Le script est automatiquement lancé par le backend orchestrateur lors de la sélection de l'attaque DoS dans le dashboard.
+
+## Fonctionnement de Slowloris
+1. Ouvre plusieurs connexions HTTP vers le serveur cible
+2. Envoie des headers HTTP incomplets
+3. Maintient les connexions ouvertes le plus longtemps possible
+4. Empêche le serveur d'accepter de nouvelles connexions légitimes
 
 ## Impact attendu
-- Ralentissement du serveur
-- Timeouts sur les requêtes
-- Indisponibilité du service
-- Saturation CPU/RAM
+- Ralentissement important du serveur DVWA
+- Timeouts sur les requêtes HTTP
+- Indisponibilité temporaire du service
+- Saturation des connexions disponibles
 
 ## Contre-mesures
-- Rate limiting (limite de requêtes par IP)
-- Cloudflare / CDN
+- Rate limiting (limite de connexions par IP)
+- Timeout de connexion agressif
 - Load balancing
 - WAF (Web Application Firewall)
-- Blacklisting d'IPs suspectes
+- Reverse proxy avec protection DoS (nginx, Cloudflare)
+- Augmentation du nombre de connexions simultanées autorisées
 
-## TODO pour Jordan
-- [ ] Implémenter plusieurs types d'attaques DoS
-- [ ] Mesurer l'impact sur le serveur (temps de réponse)
-- [ ] Tester avec hping3 si disponible
-- [ ] Implémenter Slowloris
-- [ ] Démontrer les contre-mesures (rate limiting)
+## Configuration actuelle
+- Port cible : 80
+- Sleeptime : 15 secondes
+- Mode verbose activé
 
 ## ⚠️ Avertissement
 N'utilisez ce script QUE dans l'environnement Docker isolé du projet.

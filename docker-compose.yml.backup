@@ -1,18 +1,13 @@
 services:
-  # Cible vulnérable (DVWA - Damn Vulnerable Web Application)
+  # Cible vulnérable (Skyblog)
   target:
-    image: vulnerables/web-dvwa
-    container_name: target-dvwa
+    build: ./target
+    container_name: target
     ports:
-      - "3000:80"
+      - "3000:3000"
     networks:
       - attack-net
     restart: unless-stopped
-    environment:
-      - MYSQL_ROOT_PASSWORD=dvwa
-      - MYSQL_DATABASE=dvwa
-      - MYSQL_USER=dvwa
-      - MYSQL_PASSWORD=p@ssw0rd
 
   # Backend orchestrateur (lance les attaques)
   backend:
@@ -29,7 +24,7 @@ services:
       - target
     restart: unless-stopped
     environment:
-      - TARGET_URL=http://target:80
+      - TARGET_URL=http://target:3000
 
   # Interface React (dashboard)
   frontend:
