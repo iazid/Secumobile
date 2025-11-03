@@ -488,71 +488,71 @@ function App() {
           <div className="metrics-section">
             <label>Métriques DoS en temps réel</label>
             <div className="charts-grid">
-              <div className="chart-container">
+              <div className="chart-container full-width">
                 <h3>Temps de réponse (ms)</h3>
                 <Line
                   data={{
                     labels: dosMetrics.timestamps.map((t, i) => `${i}s`),
-                    datasets: [{
-                      label: 'Temps de réponse',
-                      data: dosMetrics.responseTime,
-                      borderColor: '#2c3e50',
-                      backgroundColor: 'transparent',
-                      fill: false,
-                      tension: 0,
-                      borderWidth: 2,
-                      pointRadius: 3
-                    }]
+                    datasets: [
+                      {
+                        label: 'Temps de réponse',
+                        data: dosMetrics.responseTime,
+                        borderColor: '#2c3e50',
+                        backgroundColor: 'transparent',
+                        fill: false,
+                        tension: 0,
+                        borderWidth: 2,
+                        pointRadius: 3
+                      },
+                      {
+                        label: 'Seuil Normal (1500ms)',
+                        data: Array(dosMetrics.timestamps.length).fill(1500),
+                        borderColor: '#28a745',
+                        backgroundColor: 'transparent',
+                        borderDash: [5, 5],
+                        borderWidth: 1,
+                        pointRadius: 0
+                      },
+                      {
+                        label: 'Seuil Alerte (6000ms)',
+                        data: Array(dosMetrics.timestamps.length).fill(6000),
+                        borderColor: '#ffc107',
+                        backgroundColor: 'transparent',
+                        borderDash: [5, 5],
+                        borderWidth: 1,
+                        pointRadius: 0
+                      },
+                      {
+                        label: 'Seuil Critique (12000ms)',
+                        data: Array(dosMetrics.timestamps.length).fill(12000),
+                        borderColor: '#dc3545',
+                        backgroundColor: 'transparent',
+                        borderDash: [5, 5],
+                        borderWidth: 1,
+                        pointRadius: 0
+                      }
+                    ]
                   }}
                   options={{
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
                       x: {
-                        title: { display: true, text: 'Temps écoulé' }
+                        title: { display: true, text: 'Temps écoulé' },
+                        grid: { display: true, color: 'rgba(0,0,0,0.05)' }
                       },
                       y: {
                         beginAtZero: true,
-                        title: { display: true, text: 'Temps (ms)' }
+                        title: { display: true, text: 'Temps (ms)' },
+                        grid: { display: true, color: 'rgba(0,0,0,0.05)' }
                       }
                     },
                     plugins: {
-                      legend: { display: false }
-                    }
-                  }}
-                />
-              </div>
-
-              <div className="chart-container">
-                <h3>Requêtes par seconde</h3>
-                <Line
-                  data={{
-                    labels: dosMetrics.timestamps.map((t, i) => `${i}s`),
-                    datasets: [{
-                      label: 'Req/sec',
-                      data: dosMetrics.requestsPerSecond,
-                      borderColor: '#6c757d',
-                      backgroundColor: 'transparent',
-                      fill: false,
-                      tension: 0,
-                      borderWidth: 2,
-                      pointRadius: 3
-                    }]
-                  }}
-                  options={{
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                      x: {
-                        title: { display: true, text: 'Temps écoulé' }
-                      },
-                      y: {
-                        beginAtZero: true,
-                        title: { display: true, text: 'Req/s' }
+                      legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: { font: { size: 10 } }
                       }
-                    },
-                    plugins: {
-                      legend: { display: false }
                     }
                   }}
                 />

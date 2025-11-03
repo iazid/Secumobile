@@ -93,14 +93,14 @@ docker-compose up --build
 
 ## Fonctionnalités
 
-- ✅ **Sélection d'attaque** avec paramètres configurables
-- ✅ **Logs en temps réel** pour chaque attaque
-- ✅ **Métriques DoS** : graphiques de temps de réponse et débit
-- ✅ **Extraction de données** : dump automatique des bases SQL
-- ✅ **Résultats XSS** : statistiques + capture d'écran d'exploitation
-- ✅ **Interface sobre** : style professionnel sans fioritures
-- ✅ **Boutons de contrôle** : lancer, arrêter, réinitialiser
-- ✅ **Documentation intégrée** : explications de chaque type d'attaque
+- **Sélection d'attaque** avec paramètres configurables
+- **Logs en temps réel** pour chaque attaque
+- **Métriques DoS** : graphiques de temps de réponse et débit
+- **Extraction de données** : dump automatique des bases SQL
+- **Résultats XSS** : statistiques + capture d'écran d'exploitation
+- **Interface sobre** : style professionnel sans fioritures
+- **Boutons de contrôle** : lancer, arrêter, réinitialiser
+- **Documentation intégrée** : explications de chaque type d'attaque
 
 ## Avertissement
 

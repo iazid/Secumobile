@@ -913,7 +913,7 @@ body {
 
 .charts-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr;
   gap: 15px;
   width: 100%;
   box-sizing: border-box;
@@ -927,6 +927,10 @@ body {
   height: 300px;
   min-width: 0;
   box-sizing: border-box;
+}
+
+.chart-container.full-width {
+  grid-column: 1;
 }
 
 .chart-container h3 {

